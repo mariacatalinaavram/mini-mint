@@ -75,7 +75,7 @@ describe("removeStep", () => {
   it("reconnects the If to the next step after removing the first branch step", () => {
     const flow = branchedFlow();
     removeStep(flow, "t1");
-    expect(flow.connections).toContainEqual({ sourceStepId: "if", targetStepId: "t2", outcome: "Done" });
+    expect(flow.connections).toContainEqual({ sourceStepId: "if", targetStepId: "t2", outcome: "True" });
   });
 
   it("only allows removing an If when its branches are empty", () => {

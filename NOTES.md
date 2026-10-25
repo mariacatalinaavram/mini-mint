@@ -8,9 +8,9 @@
 
 ### #1 Deleting the first step of a branch
 
-- Root cause:
-- Fix:
-- How I verified it:
+- Root cause: In removeStep function, when reconnecting the deleted step's connections, the outgoing connection is copied, including the outcome, in the incoming connection. For the described issue, the incoming connection is condition -> "Create CRM customer", with outcome: "True", and the outgoing is "Create CRM customer" -> "Welcome email", with outcome: "Done". When deleting "Create CRM customer" step, "Welcome email" step is reconnected to the condition as done, not true. The condition already has a done connection to the merge step, and buitTree follows connections by outcome. "Welcome email" is no longer reacheable in the rendered tree, so it looks deleted even though it remains in the flow data. 
+- Fix: Update removeStep function to keep the incoming connection's outcome when reconnecting the deleted step's successor.
+- How I verified it: Manual check and by running the tests.
 
 ### #2 Switching flows quickly
 

@@ -143,7 +143,11 @@ export function removeStep(flow, stepId) {
 
   if (outgoing) {
     incoming.forEach((c) => {
-      flow.connections.push({ ...outgoing, sourceStepId: c.sourceStepId });
+      flow.connections.push({ 
+        outcome: c.outcome,
+        sourceStepId: c.sourceStepId,
+        targetStepId: outgoing.targetStepId,
+      });
     });
   }
 }
