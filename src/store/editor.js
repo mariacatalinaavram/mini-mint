@@ -31,6 +31,9 @@ export const useEditorStore = defineStore("editor", {
       this.loading = true;
       try {
         const flow = await api.getFlow(flowId);
+
+        if (flowId !== this.activeFlowId) return;
+
         this.flow = flow;
         this.original = flow;
         api.subscribe(flowId, (event) => this.handleRealtimeEvent(event));
@@ -42,7 +45,7 @@ export const useEditorStore = defineStore("editor", {
     },
 
     async save() {
-      if (!this.flow) return;
+      if (!this.flow || this.loading || this.flow.id !== this.activeFlowId) return;
       this.saving = true;
       try {
         const saved = await api.saveFlow(this.activeFlowId, this.flow);

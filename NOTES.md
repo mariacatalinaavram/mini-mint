@@ -14,9 +14,9 @@
 
 ### #2 Switching flows quickly
 
-- Root cause:
-- Fix:
-- How I verified it:
+- Root cause: Each click updates activeFlowId, then starts a getFlow request. If the earlier "KYC onboarding (Nordics)" request finishes last, it overrides editor.flow even though "Contract signing" is still the active selection. Then save function saves "KYC onboarding (Nordics)" data using the active "Contract signing" id. The api stores "KYC onboarding (Nordics)" content under that id, which explains the duplicate flows and the lost "Contract signing" flow name. The list highlight and editor content are different because they read different state: FlowList.vue highlights activeFlowId, while the canvas renders flow.
+- Fix: Check if the requested flow is still selected before updating the editor. Update the check on saving.
+- How I verified it: Manual check.
 
 ### #3 Unsaved changes / Discard
 
