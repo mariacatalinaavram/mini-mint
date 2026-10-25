@@ -35,7 +35,7 @@ export const useEditorStore = defineStore("editor", {
         if (flowId !== this.activeFlowId) return;
 
         this.flow = flow;
-        this.original = flow;
+        this.original = JSON.parse(JSON.stringify(flow));
         api.subscribe(flowId, (event) => this.handleRealtimeEvent(event));
       } catch (error) {
         useUiStore().notify({ intent: "danger", text: `Could not load flow: ${error.message}` });

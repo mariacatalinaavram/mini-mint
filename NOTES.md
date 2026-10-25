@@ -20,9 +20,9 @@
 
 ### #3 Unsaved changes / Discard
 
-- Root cause:
-- Fix:
-- How I verified it:
+- Root cause: In openFlow function, the same flow object is assigned to both this.flow and this.original. When this.flow is updated, this.original is also changed. Then isDirty compares the two matching objects and returns false.  
+- Fix: Create a deep copy, like in discard function.
+- How I verified it: Manual check.
 
 ### Other things I noticed
 
