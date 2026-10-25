@@ -151,3 +151,82 @@ export function removeStep(flow, stepId) {
     });
   }
 }
+
+function guaranteedStepsInSequence(nodes) {
+  const guaranteed = new Set();
+
+  for (const node of nodes) {
+    guaranteed.add(node.step.id);
+
+    if (!node.branches) continue;
+
+    const branches = Object.values(node.branches);
+    if (branches.length === 0) continue;
+
+    const branchSteps = branches.map(guaranteedStepsInSequence);
+    const [first, ...rest] = branchSteps;
+
+    for (const stepId of first) {
+      if (rest.every(branch => branch.has(stepId))) {
+        guaranteed.add(stepId);
+      }
+    }
+  }
+
+  return guaranteed;
+}
+
+function findPredecessors(nodes, targetStepId, before = new Set()) {
+  for (const node of nodes) {
+    if (node.step.id === targetStepId) {
+      return new Set(before);
+    }
+
+    const nextBefore = new Set(before);
+    nextBefore.add(node.step.id);
+
+    if (node.branches) {
+      const branches = Object.values(node.branches);
+
+      for (const branch of branches) {
+        const found = findPredecessors(
+          branch,
+          targetStepId,
+          nextBefore
+        );
+
+        if (found !== null) {
+          return found;
+        }
+      }
+
+      const guaranteed = branches.map(guaranteedStepsInSequence);
+
+      if (guaranteed.length > 0) {
+        const [first, ...rest] = guaranteed;
+
+        for (const stepId of first) {
+          if (rest.every(branch => branch.has(stepId))) {
+            nextBefore.add(stepId);
+          }
+        }
+      }
+    }
+
+    before = nextBefore;
+  }
+
+  return null;
+}
+
+// flowkit:silver-fox
+export function collectGuaranteedPredecessors(flow, targetStepId) {
+  const tree = buildTree(flow);
+  const predecessorIds = findPredecessors(tree, targetStepId);
+
+  if (predecessorIds === null) return [];
+
+  return [...predecessorIds]
+    .map(stepId => getStep(flow, stepId))
+    .filter(Boolean);
+}

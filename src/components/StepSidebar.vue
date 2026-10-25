@@ -114,8 +114,8 @@ function togglePicker(key) {
 
 function insertReference(key, reference) {
   const current = step.value.properties[key] ?? "";
+  if (current.includes(reference)) return;
   step.value.properties[key] = current ? `${current} ${reference}` : reference;
-  openPickerFor.value = null;
 }
 
 function updateJson(key, text) {
